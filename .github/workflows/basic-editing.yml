@@ -1,6 +1,10 @@
 name: Basic Editing 
 
-on: [pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - basic-editing
 
 jobs:
   build:
