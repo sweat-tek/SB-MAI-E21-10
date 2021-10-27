@@ -18,6 +18,7 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
       - name: Build and verify with Maven
+        working-directory: ./JHotDraw
         run: mvn --batch-mode --update-snapshots verify
     
     
