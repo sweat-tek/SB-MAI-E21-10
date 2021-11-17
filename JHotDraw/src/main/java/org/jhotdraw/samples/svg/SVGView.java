@@ -89,6 +89,7 @@ public class SVGView extends AbstractView implements ExportableView {
     /**
      * Creates a new Drawing for this View.
      */
+    @FeatureEntryPoint(JHotDrawFeatures.OPEN_VARIOUS_FORMATS)
     protected Drawing createDrawing() {
         Drawing drawing = new QuadTreeDrawing();
         LinkedList<InputFormat> inputFormats = new LinkedList<InputFormat>();
