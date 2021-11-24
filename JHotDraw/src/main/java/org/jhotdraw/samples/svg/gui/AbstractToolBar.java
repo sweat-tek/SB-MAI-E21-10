@@ -21,7 +21,6 @@ import javax.swing.*;
 import org.jhotdraw.app.JHotDrawFeatures;
 import org.jhotdraw.gui.*;
 import org.jhotdraw.draw.*;
-
 /**
  * AbstractToolBar.
  *
@@ -63,19 +62,16 @@ public /*abstract*/ class AbstractToolBar extends JDisclosureToolBar {
 
     protected PropertyChangeListener getEventHandler() {
         if (eventHandler == null) {
-            eventHandler = new PropertyChangeListener() {
-
-                public void propertyChange(PropertyChangeEvent evt) {
-                    String name = evt.getPropertyName();
-                    if (name == DISCLOSURE_STATE_PROPERTY) {
-                        try {
-                            prefs.putInt(getID() + ".disclosureState", (Integer) evt.getNewValue());
-                        } catch (IllegalStateException e) {
-                            // This happens, due to a bug in Apple's implementation
-                            // of the Preferences class.
-                            System.err.println("Warning AbstractToolBar caught IllegalStateException of Preferences class");
-                            e.printStackTrace();
-                        }
+            eventHandler = (PropertyChangeEvent evt) -> {
+                String name1 = evt.getPropertyName();
+                if (name1.equals(DISCLOSURE_STATE_PROPERTY)) {
+                    try {
+                        prefs.putInt(getID() + ".disclosureState", (Integer) evt.getNewValue());
+                    } catch (IllegalStateException e) {
+                        // This happens, due to a bug in Apple's implementation
+                        // of the Preferences class.
+                        System.err.println("Warning AbstractToolBar caught IllegalStateException of Preferences class");
+                        e.printStackTrace();
                     }
                 }
             };
@@ -110,16 +106,18 @@ public /*abstract*/ class AbstractToolBar extends JDisclosureToolBar {
         return panels[state];
     }
 
+    //markus: this just return null?
     /*abstract*/ protected JComponent createDisclosedComponent(int state) {
         return null;
     }
 
+    //Markus: this just return 0?
     protected int getDefaultDisclosureState() {
         return 0;
     }
-
-    private class ProxyPanel extends JPanel {
-
+    
+    //Markus: Should this be its own java file.
+    protected class ProxyPanel extends JPanel {
         private Runnable runner;
 
         public ProxyPanel() {
@@ -136,41 +134,45 @@ public /*abstract*/ class AbstractToolBar extends JDisclosureToolBar {
             super.paint(g);
             final int state = getDisclosureState();
             if (runner == null) {
-                runner = new Runnable() {
-
-                    public void run() {
-                        try {
-                        // long start = System.currentTimeMillis();
-                        panels[state] = createDisclosedComponent(state);
-                        } catch (Throwable t) {
-                            t.printStackTrace();
-                            panels[state]=null;
-                        }
-                        // long end = System.currentTimeMillis();
-                        // System.out.println(AbstractToolBar.this.getClass()+" state:"+state+" elapsed:"+(end-start));
-                        JComponent parent = (JComponent) getParent();
-                        if (parent != null) {
-                            GridBagLayout layout = (GridBagLayout) parent.getLayout();
-                            GridBagConstraints gbc = layout.getConstraints(ProxyPanel.this);
-
-                            parent.remove(ProxyPanel.this);
-                            if (getDisclosureState() == state) {
-                            if (panels[state] != null) {
-                                parent.add(panels[state], gbc);
-                            } else {
-                                JPanel empty = new JPanel(new BorderLayout());
-                                empty.setOpaque(false);
-                                parent.add(empty, gbc);
-                            }
-                            }
-                            parent.revalidate();
-                            ((JComponent) parent.getRootPane().getContentPane()).revalidate();
-
-                        }
-                    }
-                };
-                SwingUtilities.invokeLater(runner);
+                runner = () -> {
+                    setContraints(state);
+                } //Maybe this runnable, could be its own class with its own name, extending runnable.
+                ; 
+                SwingUtilities.invokeLater((Runnable) runner);
             }
+        }
+        private void setContraints(int state){
+            try {
+                panels[state] = createDisclosedComponent(state);
+            } catch (Throwable t) {
+                t.printStackTrace();
+                panels[state]=null;
+            }
+            setProxyPanel(state);
+            
+        }
+        private void setProxyPanel(int state){
+            JComponent parent = (JComponent) getParent();
+            if (parent != null) {
+                GridBagLayout layout = (GridBagLayout) parent.getLayout();
+                GridBagConstraints gbc = layout.getConstraints(ProxyPanel.this);
+                parent.remove(ProxyPanel.this);
+                parent = addNewPanel(state, parent, gbc);
+                parent.revalidate();
+                ((JComponent) parent.getRootPane().getContentPane()).revalidate();
+            }
+        }
+        private JComponent addNewPanel(int state, JComponent parent, GridBagConstraints gbc){
+            if (getDisclosureState() == state) {
+                    if (panels[state] != null) {
+                        parent.add(panels[state], gbc);
+                    } else {
+                        JPanel empty = new JPanel(new BorderLayout());
+                        empty.setOpaque(false);
+                        parent.add(empty, gbc);
+                    }
+                }
+            return parent;
         }
     }
 
