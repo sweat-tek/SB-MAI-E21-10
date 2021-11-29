@@ -40,10 +40,6 @@ public class SendToBackAction extends AbstractArrangeAction {
     } 
 
     @FeatureEntryPoint(JHotDrawFeatures.ARRANGE)
-    @Override
-    public void actionPerformed(java.awt.event.ActionEvent e) {
-        super.actionPerformed(e);
-    }
     public static void sendToBack(DrawingView view, Collection figures) {
         Iterator i = figures.iterator();
         Drawing drawing = view.getDrawing();

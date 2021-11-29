@@ -39,11 +39,7 @@ public class BringToFrontAction extends AbstractArrangeAction {
         super(editor, ID);
     }
 
-    @FeatureEntryPoint(JHotDrawFeatures.ARRANGE)
-    @Override
-    public void actionPerformed(java.awt.event.ActionEvent e) {
-        super.actionPerformed(e);
-    }
+    @FeatureEntryPoint(JHotDrawFeatures.ARRANGE)    
     public static void bringToFront(DrawingView view, Collection<Figure> figures) {
         Drawing drawing = view.getDrawing();
         Iterator i = drawing.sort(figures).iterator();

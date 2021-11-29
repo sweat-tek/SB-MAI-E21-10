@@ -32,7 +32,6 @@ public abstract class AbstractArrangeAction extends AbstractSelectedAction{
         final DrawingView view = getView();
         final LinkedList<Figure> figures = new LinkedList<Figure>(view.getSelectedFigures());
         doArrange(view, figures);
-        //bringToFront(view, figures);
         fireUndoableEditHappened(new AbstractUndoableEdit() {
             @Override
             public String getPresentationName() {
@@ -42,13 +41,11 @@ public abstract class AbstractArrangeAction extends AbstractSelectedAction{
             public void redo() throws CannotRedoException {
                 super.redo();
                 doArrange(view, figures);
-                //BringToFrontAction.bringToFront(view, figures);
             }
             @Override
             public void undo() throws CannotUndoException {
                 super.undo();
                 undoArrange(view, figures);
-                //SendToBackAction.sendToBack(view, figures);
             }
         }
         
