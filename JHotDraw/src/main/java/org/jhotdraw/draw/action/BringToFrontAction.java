@@ -41,6 +41,7 @@ public class BringToFrontAction extends AbstractSelectedAction {
     }
 
     @FeatureEntryPoint(JHotDrawFeatures.ARRANGE)
+    @Override
     public void actionPerformed(java.awt.event.ActionEvent e) {
         final DrawingView view = getView();
         final LinkedList<Figure> figures = new LinkedList<Figure>(view.getSelectedFigures());
@@ -48,7 +49,7 @@ public class BringToFrontAction extends AbstractSelectedAction {
         fireUndoableEditHappened(new AbstractUndoableEdit() {
             @Override
             public String getPresentationName() {
-       return labels.getTextProperty(ID);
+                return labels.getTextProperty(ID);
             }
             @Override
             public void redo() throws CannotRedoException {

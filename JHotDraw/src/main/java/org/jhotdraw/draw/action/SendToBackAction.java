@@ -30,6 +30,7 @@ import org.jhotdraw.draw.*;
  * for consistency with the API of Drawing.
  * <br>1.0 24. November 2003  Created.
  */
+
 public class SendToBackAction extends AbstractSelectedAction {
     
        public static String ID = "edit.sendToBack";
@@ -37,9 +38,10 @@ public class SendToBackAction extends AbstractSelectedAction {
     public SendToBackAction(DrawingEditor editor) {
         super(editor);
         labels.configureAction(this, ID);
-    }
+    } 
 
     @FeatureEntryPoint(JHotDrawFeatures.ARRANGE)
+    @Override
     public void actionPerformed(java.awt.event.ActionEvent e) {
         final DrawingView view = getView();
         final LinkedList<Figure> figures = new LinkedList<Figure>(view.getSelectedFigures());
@@ -47,7 +49,7 @@ public class SendToBackAction extends AbstractSelectedAction {
         fireUndoableEditHappened(new AbstractUndoableEdit() {
             @Override
             public String getPresentationName() {
-       return labels.getTextProperty(ID);
+                return labels.getTextProperty(ID);
             }
             @Override
             public void redo() throws CannotRedoException {

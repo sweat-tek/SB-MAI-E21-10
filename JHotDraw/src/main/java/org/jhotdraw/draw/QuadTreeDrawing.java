@@ -246,7 +246,7 @@ public class QuadTreeDrawing extends AbstractDrawing {
         }
         return contained;
     }
-
+    
     @Override
     @FeatureEntryPoint(JHotDrawFeatures.ARRANGE)
     public void bringToFront(Figure figure) {
@@ -266,7 +266,7 @@ public class QuadTreeDrawing extends AbstractDrawing {
             fireAreaInvalidated(figure.getDrawingArea());
         }
     }
-
+    
     @Override
     public boolean contains(Figure f) {
         return children.contains(f);
