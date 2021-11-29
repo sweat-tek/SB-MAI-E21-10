@@ -30,40 +30,19 @@ import org.jhotdraw.draw.*;
  * for consistency with the API of Drawing. 
  * <br>1.0 24. November 2003  Created.
  */
-public class BringToFrontAction extends AbstractSelectedAction {
+public class BringToFrontAction extends AbstractArrangeAction {
     
        public static String ID = "edit.bringToFront";
        
     /** Creates a new instance. */
     public BringToFrontAction(DrawingEditor editor) {
-        super(editor);
-        labels.configureAction(this, ID);
+        super(editor, ID);
     }
 
     @FeatureEntryPoint(JHotDrawFeatures.ARRANGE)
     @Override
     public void actionPerformed(java.awt.event.ActionEvent e) {
-        final DrawingView view = getView();
-        final LinkedList<Figure> figures = new LinkedList<Figure>(view.getSelectedFigures());
-        bringToFront(view, figures);
-        fireUndoableEditHappened(new AbstractUndoableEdit() {
-            @Override
-            public String getPresentationName() {
-                return labels.getTextProperty(ID);
-            }
-            @Override
-            public void redo() throws CannotRedoException {
-                super.redo();
-                BringToFrontAction.bringToFront(view, figures);
-            }
-            @Override
-            public void undo() throws CannotUndoException {
-                super.undo();
-                SendToBackAction.sendToBack(view, figures);
-            }
-        }
-        
-        );
+        super.actionPerformed(e);
     }
     public static void bringToFront(DrawingView view, Collection<Figure> figures) {
         Drawing drawing = view.getDrawing();
@@ -73,5 +52,14 @@ public class BringToFrontAction extends AbstractSelectedAction {
             drawing.bringToFront(figure);
         }
     }
-    
+
+    @Override
+    public void undoArrange(DrawingView view, Collection<Figure> figures) {
+        SendToBackAction.sendToBack(view, figures);
+    }
+
+    @Override
+    public void doArrange(DrawingView view, Collection<Figure> figures) {
+        bringToFront(view, figures);
+    }    
 }
