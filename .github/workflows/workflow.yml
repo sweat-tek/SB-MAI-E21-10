@@ -1,4 +1,4 @@
-name: Basic Editing 
+name: Java CI
 
 on:
   pull_request:
