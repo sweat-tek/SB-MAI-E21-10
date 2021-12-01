@@ -121,11 +121,7 @@ public class PictImageInputFormat implements InputFormat {
             }
             ImageHolderFigure figure = (ImageHolderFigure) prototype.clone();
             figure.setBufferedImage(Images.toBufferedImage(img));
-            figure.setBounds(
-                    new Point2D.Double(0, 0),
-                    new Point2D.Double(
-                    figure.getBufferedImage().getWidth(),
-                    figure.getBufferedImage().getHeight()));
+            setFigureBounds(figure);
             if (replace) {
                 drawing.removeAllChildren();
             }
@@ -143,11 +139,7 @@ public class PictImageInputFormat implements InputFormat {
             }
             ImageHolderFigure figure = (ImageHolderFigure) prototype.clone();
             figure.setBufferedImage(Images.toBufferedImage(img));
-            figure.setBounds(
-                    new Point2D.Double(0, 0),
-                    new Point2D.Double(
-                    figure.getBufferedImage().getWidth(),
-                    figure.getBufferedImage().getHeight()));
+            setFigureBounds(figure);
             if (replace) {
                 drawing.removeAllChildren();
             }
@@ -160,11 +152,7 @@ public class PictImageInputFormat implements InputFormat {
     public ImageHolderFigure createImageHolder(InputStream in) throws IOException {
         ImageHolderFigure figure = (ImageHolderFigure) prototype.clone();
         figure.setBufferedImage(Images.toBufferedImage(getImageFromPictStream(in)));
-        figure.setBounds(
-                new Point2D.Double(0, 0),
-                new Point2D.Double(
-                figure.getBufferedImage().getWidth(),
-                figure.getBufferedImage().getHeight()));
+        setFigureBounds(figure);
         return figure;
     }
 
@@ -184,11 +172,7 @@ public class PictImageInputFormat implements InputFormat {
                 }
                 ImageHolderFigure figure = (ImageHolderFigure) prototype.clone();
                 figure.setBufferedImage(Images.toBufferedImage(img));
-                figure.setBounds(
-                        new Point2D.Double(0, 0),
-                        new Point2D.Double(
-                        figure.getBufferedImage().getWidth(),
-                        figure.getBufferedImage().getHeight()));
+                setFigureBounds(figure);
                 if (replace) {
                     drawing.removeAllChildren();
                 }
@@ -198,6 +182,15 @@ public class PictImageInputFormat implements InputFormat {
             }
         }
     }
+    
+    public void setFigureBounds(ImageHolderFigure figure){
+        figure.setBounds(
+                new Point2D.Double(0, 0),
+                new Point2D.Double(
+                figure.getBufferedImage().getWidth(),
+                figure.getBufferedImage().getHeight()));
+    }
+    
     /*
      * Converts a PICT to an AWT image using QuickTime for Java.
      * This code was contributed by Gord Peters.
@@ -206,7 +199,7 @@ public class PictImageInputFormat implements InputFormat {
      * code which directly accesses the native clipboard.
      */
     @SuppressWarnings("unchecked")
-    private static Image getImageFromPictStream(InputStream is) throws IOException {
+    public static Image getImageFromPictStream(InputStream is) throws IOException {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             // We need to strip the header from the data because a PICT file
@@ -226,65 +219,33 @@ public class PictImageInputFormat implements InputFormat {
                 return null;
             }
             byte[] imgBytes = baos.toByteArray();
-            // Again with the uglyness.  Here we need to use the Quicktime
-            // for Java code in order to create an Image object from
-            // the PICT data we received on the clipboard.  However, in
-            // order to get this to compile on other platforms, we use
-            // the Java reflection API.
-            //
-            // For reference, here is the equivalent code without
-            // reflection:
-            //
-            //
-            // if (QTSession.isInitialized() == false) {
-            //     QTSession.open();
-            // }
-            // QTHandle handle= new QTHandle(imgBytes);
-            // GraphicsImporter gi=
-            //     new GraphicsImporter(QTUtils.toOSType("PICT"));
-            // gi.setDataHandle(handle);
-            // QDRect qdRect= gi.getNaturalBounds();
-            // GraphicsImporterDrawer gid= new GraphicsImporterDrawer(gi);
-            // QTImageProducer qip= new QTImageProducer(gid,
-            //                          new Dimension(qdRect.getWidth(),
-            //                                        qdRect.getHeight()));
-            // return(Toolkit.getDefaultToolkit().createImage(qip));
-            //
-            // --GP
-            //IJ.log("quicktime.QTSession");
+            
             Class c = Class.forName("quicktime.QTSession");
             Method m = c.getMethod("isInitialized");
             Boolean b = (Boolean) m.invoke(null, (Object[]) null);
+            
             if (b.booleanValue() == false) {
                 m = c.getMethod("open");
                 m.invoke(null);
             }
+            
             c = Class.forName("quicktime.util.QTHandle");
             Constructor con = c.getConstructor(new Class[]{imgBytes.getClass()});
             Object handle = con.newInstance(new Object[]{imgBytes});
             String s = new String("PICT");
-            c = Class.forName("quicktime.util.QTUtils");
-            m = c.getMethod("toOSType", new Class[]{s.getClass()});
-            Integer type = (Integer) m.invoke(null, new Object[]{s});
-            c = Class.forName("quicktime.std.image.GraphicsImporter");
-            con = c.getConstructor(new Class[]{type.TYPE});
-            Object importer = con.newInstance(new Object[]{type});
-            m = c.getMethod("setDataHandle",
-                    new Class[]{Class.forName("quicktime.util." + "QTHandleRef")});
-            m.invoke(importer, new Object[]{handle});
-            m = c.getMethod("getNaturalBounds");
-            Object rect = m.invoke(importer);
-            c = Class.forName("quicktime.app.view.GraphicsImporterDrawer");
-            con = c.getConstructor(new Class[]{importer.getClass()});
-            Object iDrawer = con.newInstance(new Object[]{importer});
-            m = rect.getClass().getMethod("getWidth");
-            Integer width = (Integer) m.invoke(rect);
-            m = rect.getClass().getMethod("getHeight");
-            Integer height = (Integer) m.invoke(rect);
-            Dimension d = new Dimension(width.intValue(), height.intValue());
-            c = Class.forName("quicktime.app.view.QTImageProducer");
-            con = c.getConstructor(new Class[]{iDrawer.getClass(), d.getClass()});
-            Object producer = con.newInstance(new Object[]{iDrawer, d});
+            
+            Integer type = createType(c, m, s);
+            
+            Object importer = createImporter(c, con, type);
+            
+            Object rect = createRect(c, m, handle, importer);
+            
+            Object iDrawer = createDrawer(c, con, importer);
+            
+            Dimension d = createDimension(m, rect);
+            
+            Object producer = createProducer(c, con, iDrawer, d);
+            
             if (producer instanceof ImageProducer) {
                 return (Toolkit.getDefaultToolkit().createImage((ImageProducer) producer));
             }
@@ -295,5 +256,51 @@ public class PictImageInputFormat implements InputFormat {
         }
         IOException error = new IOException("Couldn't read PICT image");
         throw error;
+    }
+    
+    private static Integer createType (Class c, Method m, String s) throws Exception{
+        c = Class.forName("quicktime.util.QTUtils");
+        m = c.getMethod("toOSType", new Class[]{s.getClass()});
+        Integer type = (Integer) m.invoke(null, new Object[]{s});
+        return type;
+    }
+    
+    private static Object createImporter (Class c, Constructor con, Integer type) throws Exception{
+        c = Class.forName("quicktime.std.image.GraphicsImporter");
+        con = c.getConstructor(new Class[]{type.TYPE});
+        Object importer = con.newInstance(new Object[]{type});
+        return importer;
+    }
+    
+    private static Object createRect (Class c, Method m, Object handle, Object importer) throws Exception{
+        m = c.getMethod("setDataHandle",
+                new Class[]{Class.forName("quicktime.util." + "QTHandleRef")});
+        m.invoke(importer, new Object[]{handle});
+        m = c.getMethod("getNaturalBounds");
+        Object rect = m.invoke(importer);
+        return rect;
+    }
+    
+    private static Object createDrawer (Class c, Constructor con, Object importer) throws Exception{
+        c = Class.forName("quicktime.app.view.GraphicsImporterDrawer");
+        con = c.getConstructor(new Class[]{importer.getClass()});
+        Object iDrawer = con.newInstance(new Object[]{importer});
+        return iDrawer;
+    }
+    
+    private static Dimension createDimension (Method m, Object rect) throws Exception{
+        m = rect.getClass().getMethod("getWidth");
+        Integer width = (Integer) m.invoke(rect);
+        m = rect.getClass().getMethod("getHeight");
+        Integer height = (Integer) m.invoke(rect);
+        Dimension d = new Dimension(width.intValue(), height.intValue());
+        return d;
+    }
+    
+    private static Object createProducer (Class c, Constructor con, Object iDrawer, Dimension d) throws Exception{
+        c = Class.forName("quicktime.app.view.QTImageProducer");
+        con = c.getConstructor(new Class[]{iDrawer.getClass(), d.getClass()});
+        Object producer = con.newInstance(new Object[]{iDrawer, d});
+        return producer;
     }
 }

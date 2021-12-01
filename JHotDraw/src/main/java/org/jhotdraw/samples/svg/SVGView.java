@@ -97,7 +97,6 @@ public class SVGView extends AbstractView implements ExportableView {
         inputFormats.add(new ImageInputFormat(new SVGImageFigure()));
         inputFormats.add(new ImageInputFormat(new SVGImageFigure(), "JPG", "Joint Photographics Experts Group (JPEG)", new String[] {"jpg", "jpeg", "jpe", "jif", "jfif"}, BufferedImage.TYPE_INT_RGB));
         inputFormats.add(new ImageInputFormat(new SVGImageFigure(), "GIF", "Graphics Interchange Format (GIF)", new String[] {"gif"}, BufferedImage.TYPE_INT_ARGB));
-        inputFormats.add(new ImageInputFormat(new SVGImageFigure(), "WebP", "GG ", new String[] {"webp"}, BufferedImage.TYPE_INT_ARGB));
         inputFormats.add(new PictImageInputFormat(new SVGImageFigure()));
         inputFormats.add(new TextInputFormat(new SVGTextFigure()));
         drawing.setInputFormats(inputFormats);
