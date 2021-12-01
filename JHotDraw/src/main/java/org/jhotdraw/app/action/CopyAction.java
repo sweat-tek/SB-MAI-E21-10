@@ -41,16 +41,9 @@ public class CopyAction extends AbstractAction {
 
     @FeatureEntryPoint(JHotDrawFeatures.BASIC_EDITING)
    public void actionPerformed(ActionEvent evt) {
-        Component focusOwner = KeyboardFocusManager.
-                getCurrentKeyboardFocusManager().
-                getPermanentFocusOwner();
-        if (focusOwner != null && focusOwner instanceof JComponent) {
-            JComponent component = (JComponent) focusOwner;
-            component.getTransferHandler().exportToClipboard(
-                    component,
-                    component.getToolkit().getSystemClipboard(),
-                    TransferHandler.COPY
-                    );
+        JComponent focusOwner = ComponentUtil.getJComponentFocusOwner();
+        if (focusOwner != null) {
+            ComponentUtil.copy(focusOwner);
         }
     }
 }
