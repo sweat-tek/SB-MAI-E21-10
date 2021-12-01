@@ -54,7 +54,7 @@ public class ImageInputFormat implements InputFormat {
     /**
      * File name extension used for the file filter.
      */
-    private String fileExtension;
+    private String[] fileExtension;
     /**
      * Image IO image format name.
      */
@@ -65,9 +65,9 @@ public class ImageInputFormat implements InputFormat {
      */
     private int imageType;
 
-    /** Creates a new image output format for Portable Network Graphics PNG. */
+    /** Creates a new image input format for Portable Network Graphics PNG. */
     public ImageInputFormat(ImageHolderFigure prototype) {
-        this(prototype, "PNG", "Portable Network Graphics (PNG)", "png", BufferedImage.TYPE_INT_ARGB);
+        this(prototype, "PNG", "Portable Network Graphics (PNG)", new String[] {"png"}, BufferedImage.TYPE_INT_ARGB);
     }
 
     /** Creates a new image output format for the specified image format.
@@ -78,7 +78,7 @@ public class ImageInputFormat implements InputFormat {
      * @param bufferedImageType The BufferedImage type used to produce the image.
      *          The value of this parameter must match with the format name.
      */
-    public ImageInputFormat(ImageHolderFigure prototype, String formatName, String description, String fileExtension,
+    public ImageInputFormat(ImageHolderFigure prototype, String formatName, String description, String[] fileExtension,
             int bufferedImageType) {
         this.prototype = prototype;
         this.formatName = formatName;
@@ -91,7 +91,7 @@ public class ImageInputFormat implements InputFormat {
         return new ExtensionFileFilter(description, fileExtension);
     }
 
-    public String getFileExtension() {
+    public String[] getFileExtension() {
         return fileExtension;
     }
 
@@ -102,11 +102,7 @@ public class ImageInputFormat implements InputFormat {
     public void read(File file, Drawing drawing, boolean replace) throws IOException {
         ImageHolderFigure figure = (ImageHolderFigure) prototype.clone();
         figure.loadImage(file);
-        figure.setBounds(
-                new Point2D.Double(0, 0),
-                new Point2D.Double(
-                figure.getBufferedImage().getWidth(),
-                figure.getBufferedImage().getHeight()));
+        setFigureBounds(figure);
         if (replace) {
             drawing.removeAllChildren();
         }
@@ -127,11 +123,7 @@ public class ImageInputFormat implements InputFormat {
     public ImageHolderFigure createImageHolder(InputStream in) throws IOException {
         ImageHolderFigure figure = (ImageHolderFigure) prototype.clone();
         figure.loadImage(in);
-        figure.setBounds(
-                new Point2D.Double(0, 0),
-                new Point2D.Double(
-                figure.getBufferedImage().getWidth(),
-                figure.getBufferedImage().getHeight()));
+        setFigureBounds(figure);
         return figure;
     }
 
@@ -149,11 +141,7 @@ public class ImageInputFormat implements InputFormat {
                 img = Images.toBufferedImage(img);
                 ImageHolderFigure figure = (ImageHolderFigure) prototype.clone();
                 figure.setBufferedImage((BufferedImage) img);
-                figure.setBounds(
-                        new Point2D.Double(0, 0),
-                        new Point2D.Double(
-                        figure.getBufferedImage().getWidth(),
-                        figure.getBufferedImage().getHeight()));
+                setFigureBounds(figure);
                 LinkedList<Figure> list = new LinkedList<Figure>();
                 list.add(figure);
                 if (replace) {
@@ -175,11 +163,7 @@ public class ImageInputFormat implements InputFormat {
                 img = Images.toBufferedImage(img);
                 ImageHolderFigure figure = (ImageHolderFigure) prototype.clone();
                 figure.setBufferedImage((BufferedImage) img);
-                figure.setBounds(
-                        new Point2D.Double(0, 0),
-                        new Point2D.Double(
-                        figure.getBufferedImage().getWidth(),
-                        figure.getBufferedImage().getHeight()));
+                setFigureBounds(figure);
                 LinkedList<Figure> list = new LinkedList<Figure>();
                 list.add(figure);
                 if (replace) {
@@ -195,5 +179,13 @@ public class ImageInputFormat implements InputFormat {
         } else {
             throw new IOException("Couldn't import image.");
         }
+    }
+    
+    public void setFigureBounds(ImageHolderFigure figure){
+        figure.setBounds(
+                new Point2D.Double(0, 0),
+                new Point2D.Double(
+                figure.getBufferedImage().getWidth(),
+                figure.getBufferedImage().getHeight()));
     }
 }
