@@ -24,6 +24,7 @@ import static org.jhotdraw.samples.svg.SVGAttributeKeys.*;
 import org.jhotdraw.draw.*;
 import org.jhotdraw.samples.svg.*;
 import org.jhotdraw.geom.*;
+import org.jhotdraw.samples.svg.figures.*;
 
 /**
  * SVGTextArea.
@@ -432,38 +433,65 @@ public class SVGTextAreaFigure extends SVGAttributedFigure
     }
 
     public void setFontSize(float size) {
-        Point2D.Double p = new Point2D.Double(0, size);
-        AffineTransform tx = TRANSFORM.get(this);
-        if (tx != null) {
-            try {
-                tx.inverseTransform(p, p);
-                Point2D.Double p0 = new Point2D.Double(0, 0);
-                tx.inverseTransform(p0, p0);
-                p.y -= p0.y;
-            } catch (NoninvertibleTransformException ex) {
-                ex.printStackTrace();
-            }
-        }
-        FONT_SIZE.set(this, Math.abs(p.y));
+        SVGFontSize gg = new SVGFontSize();
+        gg.setFontSize(size);
     }
-
+    
+//    public void setFontSize(float size) {
+//        // FONT_SIZE.basicSet(this, new Double(size));
+//        Point2D.Double p = new Point2D.Double(0, size);
+//        AffineTransform tx =  TRANSFORM.get(this);
+//        if (tx != null) {
+//            try {
+//                tx.inverseTransform(p, p);
+//                Point2D.Double p0 = new Point2D.Double(0, 0);
+//                tx.inverseTransform(p0, p0);
+//                p.y -= p0.y;
+//            } catch (NoninvertibleTransformException ex) {
+//                ex.printStackTrace();
+//            }
+//        }
+//        FONT_SIZE.set(this, Math.abs(p.y));
+//    }
+    
     public float getFontSize() {
-        Point2D.Double p = new Point2D.Double(0, FONT_SIZE.get(this));
-        AffineTransform tx = TRANSFORM.get(this);
-        if (tx != null) {
-            tx.transform(p, p);
-            Point2D.Double p0 = new Point2D.Double(0, 0);
-            tx.transform(p0, p0);
-            p.y -= p0.y;
-        /*
-        try {
-        tx.inverseTransform(p, p);
-        } catch (NoninvertibleTransformException ex) {
-        ex.printStackTrace();
-        }*/
-        }
-        return (float) Math.abs(p.y);
+        SVGFontSize bg = new SVGFontSize();
+        return bg.getFontSize();
     }
+    
+//    public void setFontSize(float size) {
+//        Point2D.Double p = new Point2D.Double(0, size);
+//        AffineTransform tx = TRANSFORM.get(this);
+//        if (tx != null) {
+//            try {
+//                tx.inverseTransform(p, p);
+//                Point2D.Double p0 = new Point2D.Double(0, 0);
+//                tx.inverseTransform(p0, p0);
+//                p.y -= p0.y;
+//            } catch (NoninvertibleTransformException ex) {
+//                ex.printStackTrace();
+//            }
+//        }
+//        FONT_SIZE.set(this, Math.abs(p.y));
+//    }
+//
+//    public float getFontSize() {
+//        Point2D.Double p = new Point2D.Double(0, FONT_SIZE.get(this));
+//        AffineTransform tx = TRANSFORM.get(this);
+//        if (tx != null) {
+//            tx.transform(p, p);
+//            Point2D.Double p0 = new Point2D.Double(0, 0);
+//            tx.transform(p0, p0);
+//            p.y -= p0.y;
+//        /*
+//        try {
+//        tx.inverseTransform(p, p);
+//        } catch (NoninvertibleTransformException ex) {
+//        ex.printStackTrace();
+//        }*/
+//        }
+//        return (float) Math.abs(p.y);
+//    }
 // EDITING
 
     public boolean isEditable() {
