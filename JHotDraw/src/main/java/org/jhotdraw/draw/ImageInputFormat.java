@@ -54,7 +54,7 @@ public class ImageInputFormat implements InputFormat {
     /**
      * File name extension used for the file filter.
      */
-    private String fileExtension;
+    private String[] fileExtension;
     /**
      * Image IO image format name.
      */
@@ -65,9 +65,9 @@ public class ImageInputFormat implements InputFormat {
      */
     private int imageType;
 
-    /** Creates a new image output format for Portable Network Graphics PNG. */
+    /** Creates a new image input format for Portable Network Graphics PNG. */
     public ImageInputFormat(ImageHolderFigure prototype) {
-        this(prototype, "PNG", "Portable Network Graphics (PNG)", "png", BufferedImage.TYPE_INT_ARGB);
+        this(prototype, "PNG", "Portable Network Graphics (PNG)", new String[] {"png"}, BufferedImage.TYPE_INT_ARGB);
     }
 
     /** Creates a new image output format for the specified image format.
@@ -78,7 +78,7 @@ public class ImageInputFormat implements InputFormat {
      * @param bufferedImageType The BufferedImage type used to produce the image.
      *          The value of this parameter must match with the format name.
      */
-    public ImageInputFormat(ImageHolderFigure prototype, String formatName, String description, String fileExtension,
+    public ImageInputFormat(ImageHolderFigure prototype, String formatName, String description, String[] fileExtension,
             int bufferedImageType) {
         this.prototype = prototype;
         this.formatName = formatName;
@@ -91,7 +91,7 @@ public class ImageInputFormat implements InputFormat {
         return new ExtensionFileFilter(description, fileExtension);
     }
 
-    public String getFileExtension() {
+    public String[] getFileExtension() {
         return fileExtension;
     }
 

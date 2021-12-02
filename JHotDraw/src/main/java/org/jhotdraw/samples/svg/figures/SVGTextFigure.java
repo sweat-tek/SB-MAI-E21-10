@@ -30,6 +30,7 @@ import org.jhotdraw.samples.svg.SVGConstants;
 import org.jhotdraw.util.*;
 import org.jhotdraw.xml.*;
 import static org.jhotdraw.samples.svg.SVGAttributeKeys.*;
+import org.jhotdraw.samples.svg.figures.*;
 /**
  * SVGText.
  * <p>
@@ -193,34 +194,44 @@ public class SVGTextFigure
      * @param tx the transformation.
      */
     public void transform(AffineTransform tx) {
-        if (TRANSFORM.get(this) != null ||
-                tx.getType() != (tx.getType() & AffineTransform.TYPE_TRANSLATION)) {
-            if (TRANSFORM.get(this) == null) {
-                TRANSFORM.basicSet(this, (AffineTransform) tx.clone());
-            } else {
-                AffineTransform t = TRANSFORM.getClone(this);
-                t.preConcatenate(tx);
-                TRANSFORM.basicSet(this, t);
-            }
+        if (TRANSFORM.get(this) != null || tx.getType() != (tx.getType() & AffineTransform.TYPE_TRANSLATION)) {
+                setTransform(tx);
         } else {
             for (int i=0; i < coordinates.length; i++) {
                 tx.transform(coordinates[i], coordinates[i]);
             }
-            if (FILL_GRADIENT.get(this) != null &&
-                    ! FILL_GRADIENT.get(this).isRelativeToFigureBounds()) {
-                Gradient g = FILL_GRADIENT.getClone(this);
-                g.transform(tx);
-                FILL_GRADIENT.basicSet(this, g);
+            if (FILL_GRADIENT.get(this) != null && ! FILL_GRADIENT.get(this).isRelativeToFigureBounds()) {
+                setFillGradient(tx);
             }
-            if (STROKE_GRADIENT.get(this) != null && 
-                    ! STROKE_GRADIENT.get(this).isRelativeToFigureBounds()) {
-                Gradient g = STROKE_GRADIENT.getClone(this);
-                g.transform(tx);
-                STROKE_GRADIENT.basicSet(this, g);
+            if (STROKE_GRADIENT.get(this) != null && ! STROKE_GRADIENT.get(this).isRelativeToFigureBounds()) {
+                setStrokeGradient(tx);
             }
         }
         invalidate();
     }
+
+    public void setTransform(AffineTransform tx) {
+        if (TRANSFORM.get(this) == null) {
+            TRANSFORM.basicSet(this, (AffineTransform) tx.clone());
+        } else {
+            AffineTransform t = TRANSFORM.getClone(this);
+            t.preConcatenate(tx);
+            TRANSFORM.basicSet(this, t);
+        }
+    }
+
+    public void setFillGradient(AffineTransform tx) {
+        Gradient g = FILL_GRADIENT.getClone(this);
+        g.transform(tx);
+        FILL_GRADIENT.basicSet(this, g);
+    }
+
+    public void setStrokeGradient(AffineTransform tx) {
+        Gradient g = STROKE_GRADIENT.getClone(this);
+        g.transform(tx);
+        STROKE_GRADIENT.basicSet(this, g);
+    }
+    
     public void restoreTransformTo(Object geometry) {
         Object[] restoreData = (Object[]) geometry;
         TRANSFORM.basicSetClone(this, (AffineTransform) restoreData[0]);
@@ -298,40 +309,51 @@ public class SVGTextFigure
     }
     
     public void setFontSize(float size) {
-        // FONT_SIZE.basicSet(this, new Double(size));
-        Point2D.Double p = new Point2D.Double(0, size);
-        AffineTransform tx =  TRANSFORM.get(this);
-        if (tx != null) {
-            try {
-                tx.inverseTransform(p, p);
-                Point2D.Double p0 = new Point2D.Double(0, 0);
-                tx.inverseTransform(p0, p0);
-                p.y -= p0.y;
-            } catch (NoninvertibleTransformException ex) {
-                ex.printStackTrace();
-            }
-        }
-        FONT_SIZE.set(this, Math.abs(p.y));
+        SVGFontSize setFS = new SVGFontSize();
+        setFS.setFontSize(size);
     }
     
+//    public void setFontSize(float size) {
+//        // FONT_SIZE.basicSet(this, new Double(size));
+//        Point2D.Double p = new Point2D.Double(0, size);
+//        AffineTransform tx =  TRANSFORM.get(this);
+//        if (tx != null) {
+//            try {
+//                tx.inverseTransform(p, p);
+//                Point2D.Double p0 = new Point2D.Double(0, 0);
+//                tx.inverseTransform(p0, p0);
+//                p.y -= p0.y;
+//            } catch (NoninvertibleTransformException ex) {
+//                ex.printStackTrace();
+//            }
+//        }
+//        FONT_SIZE.set(this, Math.abs(p.y));
+//    }
+    
     public float getFontSize() {
-        //   return FONT_SIZE.get(this).floatValue();
-        Point2D.Double p = new Point2D.Double(0, FONT_SIZE.get(this));
-        AffineTransform tx =  TRANSFORM.get(this);
-        if (tx != null) {
-            tx.transform(p, p);
-            Point2D.Double p0 = new Point2D.Double(0, 0);
-            tx.transform(p0, p0);
-            p.y -= p0.y;
-                /*
-            try {
-                tx.inverseTransform(p, p);
-            } catch (NoninvertibleTransformException ex) {
-                ex.printStackTrace();
-            }*/
-        }
-        return (float) Math.abs(p.y);
+        SVGFontSize getFS = new SVGFontSize();
+        return getFS.getFontSize();
     }
+    
+//    public float getFontSize() {
+//        //   return FONT_SIZE.get(this).floatValue();
+//        Point2D.Double p = new Point2D.Double(0, FONT_SIZE.get(this));
+//        AffineTransform tx =  TRANSFORM.get(this);
+//        if (tx != null) {
+//            tx.transform(p, p);
+//            Point2D.Double p0 = new Point2D.Double(0, 0);
+//            tx.transform(p0, p0);
+//            p.y -= p0.y;
+//                /*
+//            try {
+//                tx.inverseTransform(p, p);
+//            } catch (NoninvertibleTransformException ex) {
+//                ex.printStackTrace();
+//            }*/
+//        }
+//        return (float) Math.abs(p.y);
+//    }
+    
     
     // EDITING
     // CONNECTING
