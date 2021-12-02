@@ -6,6 +6,7 @@
 package org.jhotdraw.samples.svg.figures;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import org.junit.After;
@@ -46,8 +47,8 @@ public class SVGImageFigureTest {
     @Test
     public void testLoadImage_InputStream() throws Exception {
         System.out.println("loadImage");
-        String fileName = "/Users/andre/Pictures/1479378_2201.JPG";
-        InputStream in = new FileInputStream(fileName);
+        File file = new File("src/test/java/org/jhotdraw/samples/svg/figures/black.jpg");
+        InputStream in = new FileInputStream(file.getAbsolutePath());
         SVGImageFigure instance = new SVGImageFigure();
         instance.loadImage(in);
         
