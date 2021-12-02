@@ -53,7 +53,13 @@ public /*abstract*/ class AbstractToolBar extends JDisclosureToolBar {
     protected String getID() {
         return "";
     }
-
+    public JComponent[] getPanels(){
+        return panels;
+    }
+    
+    public void setPanels(JComponent[] panels){
+        this.panels = panels;
+    }
     /** This should be an abstract method, but the NetBeans GUI builder
      * doesn't support abstract beans.
      */
@@ -100,7 +106,7 @@ public /*abstract*/ class AbstractToolBar extends JDisclosureToolBar {
         if (panels == null) {
             panels = new JPanel[getDisclosureStateCount()];
             for (int i = 0; i < panels.length; i++) {
-                panels[i] = new ProxyPanel();
+                panels[i] = new ProxyPanel(this);
             }
         }
         return panels[state];
@@ -114,66 +120,6 @@ public /*abstract*/ class AbstractToolBar extends JDisclosureToolBar {
     //Markus: this just return 0?
     protected int getDefaultDisclosureState() {
         return 0;
-    }
-    
-    //Markus: Should this be its own java file.
-    protected class ProxyPanel extends JPanel {
-        private Runnable runner;
-
-        public ProxyPanel() {
-            setOpaque(false);
-            setBackground(Color.GREEN);
-            // The paint method is only called, if the proxy panel is at least
-            // one pixel wide and high.
-            setLayout(new FlowLayout(FlowLayout.LEFT, 1, 1));
-        }
-
-        @Override
-        @FeatureEntryPoint(JHotDrawFeatures.TOOL_PALETTE)
-        public void paint(Graphics g) {
-            super.paint(g);
-            final int state = getDisclosureState();
-            if (runner == null) {
-                runner = () -> {
-                    setContraints(state);
-                } //Maybe this runnable, could be its own class with its own name, extending runnable.
-                ; 
-                SwingUtilities.invokeLater((Runnable) runner);
-            }
-        }
-        private void setContraints(int state){
-            try {
-                panels[state] = createDisclosedComponent(state);
-            } catch (Throwable t) {
-                t.printStackTrace();
-                panels[state]=null;
-            }
-            setProxyPanel(state);
-            
-        }
-        private void setProxyPanel(int state){
-            JComponent parent = (JComponent) getParent();
-            if (parent != null) {
-                GridBagLayout layout = (GridBagLayout) parent.getLayout();
-                GridBagConstraints gbc = layout.getConstraints(ProxyPanel.this);
-                parent.remove(ProxyPanel.this);
-                parent = addNewPanel(state, parent, gbc);
-                parent.revalidate();
-                ((JComponent) parent.getRootPane().getContentPane()).revalidate();
-            }
-        }
-        private JComponent addNewPanel(int state, JComponent parent, GridBagConstraints gbc){
-            if (getDisclosureState() == state) {
-                    if (panels[state] != null) {
-                        parent.add(panels[state], gbc);
-                    } else {
-                        JPanel empty = new JPanel(new BorderLayout());
-                        empty.setOpaque(false);
-                        parent.add(empty, gbc);
-                    }
-                }
-            return parent;
-        }
     }
 
     /** This method is called from within the constructor to
