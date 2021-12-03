@@ -101,8 +101,7 @@ public class ImageInputFormat implements InputFormat {
 
     public void read(File file, Drawing drawing, boolean replace) throws IOException {
         ImageHolderFigure figure = (ImageHolderFigure) prototype.clone();
-        figure.lo
-          adImage(file);
+        figure.loadImage(file);
         setFigureBounds(figure);
         if (replace) {
             drawing.removeAllChildren();
