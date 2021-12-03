@@ -100,8 +100,9 @@ public class ImageInputFormat implements InputFormat {
     }
 
     public void read(File file, Drawing drawing, boolean replace) throws IOException {
-        ImageHolderFigure figure = createImageHolderFigure();
+        ImageHolderFigure figure = (ImageHolderFigure) prototype.clone();
         figure.loadImage(file);
+        setBounds(figure);
         if (replace) {
             drawing.removeAllChildren();
         }
@@ -119,19 +120,18 @@ public class ImageInputFormat implements InputFormat {
         drawing.basicAdd(createImageHolder(in));
     }
     
-    public ImageHolderFigure createImageHolderFigure() throws IOException {
-        ImageHolderFigure figure = (ImageHolderFigure) prototype.clone();
+    public void setBounds(ImageHolderFigure figure) throws IOException {
         figure.setBounds(
-                new Point2D.Double(0, 0),
-                new Point2D.Double(
-                figure.getBufferedImage().getWidth(),
-                figure.getBufferedImage().getHeight()));
-        return figure;
+            new Point2D.Double(0, 0),
+            new Point2D.Double(
+            figure.getBufferedImage().getWidth(),
+            figure.getBufferedImage().getHeight()));
     }
     
     public ImageHolderFigure createImageHolder(InputStream in) throws IOException {
-        ImageHolderFigure figure = createImageHolderFigure();
+        ImageHolderFigure figure = (ImageHolderFigure) prototype.clone();
         figure.loadImage(in);
+        setBounds(figure);
         return figure;
     }
 
@@ -156,8 +156,9 @@ public class ImageInputFormat implements InputFormat {
             try {
                 Image img = (Image) t.getTransferData(DataFlavor.imageFlavor);
                 img = Images.toBufferedImage(img);
-                ImageHolderFigure figure = createImageHolderFigure();
+                ImageHolderFigure figure = (ImageHolderFigure) prototype.clone();
                 figure.setBufferedImage((BufferedImage) img);
+                setBounds(figure);
                 addFigureToDrawing(figure, drawing, replace);
                 return;
             } catch (Throwable e) {
@@ -172,8 +173,9 @@ public class ImageInputFormat implements InputFormat {
                 InputStream in = (InputStream) t.getTransferData(ImageTransferable.IMAGE_PNG_FLAVOR);
                 Image img = ImageIO.read(in);
                 img = Images.toBufferedImage(img);
-                ImageHolderFigure figure = createImageHolderFigure();
+                ImageHolderFigure figure = (ImageHolderFigure) prototype.clone();
                 figure.setBufferedImage((BufferedImage) img);
+                setBounds(figure);
                 addFigureToDrawing(figure, drawing, replace);
             } catch (Throwable e) {
                 e.printStackTrace();
