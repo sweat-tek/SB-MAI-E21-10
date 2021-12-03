@@ -53,6 +53,7 @@ public class PasteAction extends AbstractAction {
                         component,
                         t
                 );
+                System.out.println("PASTEACTION PERFORMED");
             }
         }
 
