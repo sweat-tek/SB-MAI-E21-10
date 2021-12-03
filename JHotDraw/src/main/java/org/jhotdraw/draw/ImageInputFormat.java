@@ -119,7 +119,15 @@ public class ImageInputFormat implements InputFormat {
         }
         drawing.basicAdd(createImageHolder(in));
     }
-
+    
+    public void setFigureBounds(ImageHolderFigure figure) throws IOException {
+        figure.setBounds(
+            new Point2D.Double(0, 0),
+            new Point2D.Double(
+            figure.getBufferedImage().getWidth(),
+            figure.getBufferedImage().getHeight()));
+    }
+    
     public ImageHolderFigure createImageHolder(InputStream in) throws IOException {
         ImageHolderFigure figure = (ImageHolderFigure) prototype.clone();
         figure.loadImage(in);
@@ -131,7 +139,16 @@ public class ImageInputFormat implements InputFormat {
         return flavor.equals(DataFlavor.imageFlavor) ||
                 flavor.equals(ImageTransferable.IMAGE_PNG_FLAVOR);
     }
-
+    
+    public void addFigureToDrawing(ImageHolderFigure figure, Drawing drawing, boolean replace){
+        LinkedList<Figure> list = new LinkedList<Figure>();
+        list.add(figure);
+        if (replace) {
+            drawing.removeAllChildren();
+        }
+        drawing.addAll(list);
+    }
+    
     public void read(Transferable t, Drawing drawing, boolean replace) throws UnsupportedFlavorException, IOException {
         // 1. Try to read the image using the Java Image Flavor
         // This causes a NoSuchMethodError to be thrown on Mac OS X 10.5.2.
@@ -142,12 +159,7 @@ public class ImageInputFormat implements InputFormat {
                 ImageHolderFigure figure = (ImageHolderFigure) prototype.clone();
                 figure.setBufferedImage((BufferedImage) img);
                 setFigureBounds(figure);
-                LinkedList<Figure> list = new LinkedList<Figure>();
-                list.add(figure);
-                if (replace) {
-                    drawing.removeAllChildren();
-                }
-                drawing.addAll(list);
+                addFigureToDrawing(figure, drawing, replace);
                 return;
             } catch (Throwable e) {
                 // no need to do anything here, because we try to read the
@@ -164,12 +176,7 @@ public class ImageInputFormat implements InputFormat {
                 ImageHolderFigure figure = (ImageHolderFigure) prototype.clone();
                 figure.setBufferedImage((BufferedImage) img);
                 setFigureBounds(figure);
-                LinkedList<Figure> list = new LinkedList<Figure>();
-                list.add(figure);
-                if (replace) {
-                    drawing.removeAllChildren();
-                }
-                drawing.addAll(list);
+                addFigureToDrawing(figure, drawing, replace);
             } catch (Throwable e) {
                 e.printStackTrace();
                 IOException ex = new IOException("Couldn't import image as image/png flavor");
@@ -179,13 +186,5 @@ public class ImageInputFormat implements InputFormat {
         } else {
             throw new IOException("Couldn't import image.");
         }
-    }
-    
-    public void setFigureBounds(ImageHolderFigure figure){
-        figure.setBounds(
-                new Point2D.Double(0, 0),
-                new Point2D.Double(
-                figure.getBufferedImage().getWidth(),
-                figure.getBufferedImage().getHeight()));
     }
 }
