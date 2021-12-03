@@ -105,7 +105,7 @@ public class SVGApplicationModel extends DefaultApplicationModel {
         a.add(UngroupAction.create(editor, new SVGGroupFigure()));
         a.add(new CombineAction(editor));
         a.add(new SplitAction(editor));
-
+        
         a.add(null); // separator
         a.add(new BringToFrontAction(editor));
         a.add(new SendToBackAction(editor));

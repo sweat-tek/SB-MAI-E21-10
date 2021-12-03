@@ -44,10 +44,8 @@ public class DeleteAction extends TextAction {
 
     @FeatureEntryPoint(JHotDrawFeatures.BASIC_EDITING)
     public void actionPerformed(ActionEvent evt) {
-        Component focusOwner = KeyboardFocusManager.
-                getCurrentKeyboardFocusManager().
-                getPermanentFocusOwner();
-        if (focusOwner != null && focusOwner instanceof EditableComponent) {
+        Component focusOwner = ComponentUtil.getComponentFocusOwner();
+        if (focusOwner instanceof EditableComponent) {
             ((EditableComponent) focusOwner).delete();
         } else {
             deleteNextChar(evt);
