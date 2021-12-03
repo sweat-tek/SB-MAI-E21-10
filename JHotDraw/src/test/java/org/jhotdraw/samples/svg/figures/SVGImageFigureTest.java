@@ -48,7 +48,7 @@ public class SVGImageFigureTest {
     public void testLoadImage_InputStream() throws Exception {
         System.out.println("loadImage");
         File file = new File("src/test/java/org/jhotdraw/samples/svg/figures/black.jpg");
-        InputStream in = new FileInputStream(file.getAbsolutePath());
+        InputStream in = new FileInputStream(file);
         SVGImageFigure instance = new SVGImageFigure();
         instance.loadImage(in);
         
