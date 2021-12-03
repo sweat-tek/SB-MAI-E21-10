@@ -6,6 +6,7 @@
 package org.jhotdraw.samples.svg;
 
 import java.io.File;
+import java.io.IOException;
 import org.jhotdraw.draw.Drawing;
 import org.jhotdraw.draw.ImageInputFormat;
 import org.jhotdraw.samples.svg.figures.SVGImageFigure;
@@ -39,7 +40,7 @@ public class SVGViewTest {
     }
 
     @Test
-    public void testReadingOtherFileExtensions() throws Exception {
+    public void testReadingOtherFileExtensions() throws IOException {
         System.out.println("Trying to read image in the format of .jpeg\n");
         File f = new File("src/test/java/org/jhotdraw/samples/svg/ImageHandler.jpeg");
         ImageInputFormat iif = new ImageInputFormat(new SVGImageFigure());
