@@ -41,7 +41,7 @@ public class SVGViewTest {
     @Test
     public void testReadingOtherFileExtensions() throws Exception {
         System.out.println("Trying to read image in the format of .jpeg\n");
-        File f = new File("/Users/theis/Dropbox/Pictures/moi.jpeg");
+        File f = new File("src/test/java/org/jhotdraw/samples/svg/ImageHandler.jpeg");
         ImageInputFormat iif = new ImageInputFormat(new SVGImageFigure());
         iif.read(f, result, true);
         

@@ -53,7 +53,7 @@ public class ImageInputFormatTest {
     @Test
     public void testRead() throws IOException {
         System.out.println("test Read method");
-        File file = new File("/Users/theis/Dropbox/Pictures/Yobama.png");
+        File file = new File("src/test/java/org/jhotdraw/draw/Yobama.png");
         boolean replace = true;
         
         System.out.println(drawing.getChildren().isEmpty());
