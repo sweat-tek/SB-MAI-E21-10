@@ -30,38 +30,16 @@ import org.jhotdraw.draw.*;
  * for consistency with the API of Drawing.
  * <br>1.0 24. November 2003  Created.
  */
-public class SendToBackAction extends AbstractSelectedAction {
+
+public class SendToBackAction extends AbstractArrangeAction {
     
        public static String ID = "edit.sendToBack";
     /** Creates a new instance. */
     public SendToBackAction(DrawingEditor editor) {
-        super(editor);
-        labels.configureAction(this, ID);
-    }
+        super(editor, ID);
+    } 
 
     @FeatureEntryPoint(JHotDrawFeatures.ARRANGE)
-    public void actionPerformed(java.awt.event.ActionEvent e) {
-        final DrawingView view = getView();
-        final LinkedList<Figure> figures = new LinkedList<Figure>(view.getSelectedFigures());
-        sendToBack(view, figures);
-        fireUndoableEditHappened(new AbstractUndoableEdit() {
-            @Override
-            public String getPresentationName() {
-       return labels.getTextProperty(ID);
-            }
-            @Override
-            public void redo() throws CannotRedoException {
-                super.redo();
-                SendToBackAction.sendToBack(view, figures);
-            }
-            @Override
-            public void undo() throws CannotUndoException {
-                super.undo();
-                BringToFrontAction.bringToFront(view, figures);
-            }
-        }
-        );
-    }
     public static void sendToBack(DrawingView view, Collection figures) {
         Iterator i = figures.iterator();
         Drawing drawing = view.getDrawing();
@@ -69,5 +47,15 @@ public class SendToBackAction extends AbstractSelectedAction {
             Figure figure = (Figure) i.next();
             drawing.sendToBack(figure);
         }
+    }
+
+    @Override
+    public void undoArrange(DrawingView view, Collection<Figure> figures) {
+        BringToFrontAction.bringToFront(view, figures);
+    }
+
+    @Override
+    public void doArrange(DrawingView view, Collection<Figure> figures) {
+        sendToBack(view, figures);
     }
 }

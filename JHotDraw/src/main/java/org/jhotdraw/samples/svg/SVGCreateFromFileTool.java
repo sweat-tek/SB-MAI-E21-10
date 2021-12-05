@@ -128,6 +128,7 @@ public class SVGCreateFromFileTool extends CreationTool {
                         try {
                             InputFormat in = (file.getName().toLowerCase().endsWith(".svg")) ? new SVGInputFormat() : new SVGZInputFormat();
                             in.read(file, drawing);
+                            System.out.println("Den der read igen");
                         } catch (Throwable t) {
                             return t;
                         }

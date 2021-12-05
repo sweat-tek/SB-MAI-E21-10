@@ -11,7 +11,6 @@
  * accordance with the license agreement you entered into with  
  * the copyright holders. For details see accompanying license terms. 
  */
-
 package org.jhotdraw.app.action;
 
 import dk.sdu.mmmi.featuretracer.lib.FeatureEntryPoint;
@@ -32,9 +31,12 @@ import org.jhotdraw.app.JHotDrawFeatures;
  * @version 1.0 February 27, 2006 Created.
  */
 public class DuplicateAction extends AbstractAction {
+
     public final static String ID = "edit.duplicate";
-    
-    /** Creates a new instance. */
+
+    /**
+     * Creates a new instance.
+     */
     public DuplicateAction() {
         ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.app.Labels");
         labels.configureAction(this, ID);
@@ -42,15 +44,12 @@ public class DuplicateAction extends AbstractAction {
 
     @FeatureEntryPoint(JHotDrawFeatures.BASIC_EDITING)
     public void actionPerformed(ActionEvent evt) {
-        Component focusOwner = KeyboardFocusManager.
-                getCurrentKeyboardFocusManager().
-                getPermanentFocusOwner();
-        if (focusOwner != null) {
-            if (focusOwner instanceof EditableComponent) {
-                ((EditableComponent) focusOwner).duplicate();
-            } else {
-                focusOwner.getToolkit().beep();
-            }
+        Component focusOwner = ComponentUtil.getComponentFocusOwner();
+        if (focusOwner instanceof EditableComponent) {
+            ((EditableComponent) focusOwner).duplicate();
+        } else {
+            focusOwner.getToolkit().beep();
         }
+
     }
 }

@@ -23,7 +23,7 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
+
 import org.jhotdraw.app.EditableComponent;
 import org.jhotdraw.app.JHotDrawFeatures;
 import static org.jhotdraw.draw.AttributeKeys.*;
@@ -1013,6 +1013,38 @@ public class DefaultDrawingView
         return t;
     }
 
+    private boolean figuresRemovable(java.util.List<Figure> deletedFigures) {
+        for (Figure f : deletedFigures) {
+            if (!f.isRemovable()) {
+                getToolkit().beep();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private int[] getDeletedFigureIndices(java.util.List<Figure> deletedFigures) {
+        final int[] deletedFigureIndices = new int[deletedFigures.size()];
+        for (int i = 0; i <
+                deletedFigureIndices.length; i++) {
+            deletedFigureIndices[i] = drawing.indexOf(deletedFigures.get(i));
+        }
+        return deletedFigureIndices;
+    }
+
+    private void drawUndo(int[] deletedFigureIndices, java.util.List<Figure> deletedFigures) {
+        Drawing d = getDrawing();
+        for (int i = 0; i < deletedFigureIndices.length; i++) {
+            d.add(deletedFigureIndices[i], deletedFigures.get(i));
+        }
+    }
+
+    private void drawRedo(int[] deletedFigureIndices, java.util.List<Figure> deletedFigures) {
+        for (int i = 0; i < deletedFigureIndices.length; i++) {
+            drawing.remove(deletedFigures.get(i));
+        }
+    }
+
     @FeatureEntryPoint(JHotDrawFeatures.BASIC_EDITING)
     public void delete() {
         final LinkedList<CompositeFigureEvent> deletionEvents = new LinkedList<CompositeFigureEvent>();
@@ -1020,22 +1052,13 @@ public class DefaultDrawingView
 
         // Abort, if not all of the selected figures may be removed from the
         // drawing
-        for (Figure f : deletedFigures) {
-            if (!f.isRemovable()) {
-                getToolkit().beep();
-                return;
-
-            }
-
-
+        if (!figuresRemovable(deletedFigures)) {
+            return;
         }
 
         // Get z-indices of deleted figures
-        final int[] deletedFigureIndices = new int[deletedFigures.size()];
-        for (int i = 0; i <
-                deletedFigureIndices.length; i++) {
-            deletedFigureIndices[i] = drawing.indexOf(deletedFigures.get(i));
-        }
+        final int[] deletedFigureIndices = getDeletedFigureIndices(deletedFigures);
+
 
         clearSelection();
         getDrawing().removeAll(deletedFigures);
@@ -1053,11 +1076,7 @@ public class DefaultDrawingView
                 super.undo();
                 clearSelection();
 
-                Drawing d = getDrawing();
-                for (int i = 0; i <
-                        deletedFigureIndices.length; i++) {
-                    d.add(deletedFigureIndices[i], deletedFigures.get(i));
-                }
+                drawUndo(deletedFigureIndices, deletedFigures);
 
                 addToSelection(deletedFigures);
             }
@@ -1065,11 +1084,7 @@ public class DefaultDrawingView
             @Override
             public void redo() throws CannotRedoException {
                 super.redo();
-                for (int i = 0; i <
-                        deletedFigureIndices.length; i++) {
-                    drawing.remove(deletedFigures.get(i));
-                }
-
+                drawRedo(deletedFigureIndices, deletedFigures);
             }
         });
     }
