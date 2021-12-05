@@ -96,8 +96,7 @@ public class ExitAction extends AbstractSaveBeforeAction {
             }
         }
     }
-   
-    
+
     // method which checks if there is a view open in the application, and if yes, it then disposes of the current view.
     // if there are no unsaved views, it calls the doExit method which exits the application.
     @Override
@@ -115,5 +114,4 @@ public class ExitAction extends AbstractSaveBeforeAction {
         app.stop();
         System.exit(0);
     }
-    
 }
