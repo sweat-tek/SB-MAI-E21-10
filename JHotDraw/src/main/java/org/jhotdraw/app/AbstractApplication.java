@@ -272,4 +272,21 @@ public abstract class AbstractApplication extends AbstractBean implements Applic
 
     public void addWindow(Window window, View p) {
     }
+    
+    public static class ClearViewWorker extends Worker {
+        private final View view;
+        
+        public ClearViewWorker(View view){
+            this.view = view;
+        }
+        
+        public Object construct() {
+            view.clear();
+            return null;
+        }
+        
+        public void finished (Object result){
+            view.setEnabled(true);
+        }
+    }
 }

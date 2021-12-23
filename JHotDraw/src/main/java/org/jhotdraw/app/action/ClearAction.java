@@ -14,6 +14,7 @@
 
 package org.jhotdraw.app.action;
 
+import org.jhotdraw.app.AbstractApplication;
 import org.jhotdraw.gui.Worker;
 import org.jhotdraw.util.*;
 import java.awt.*;
@@ -41,14 +42,6 @@ public class ClearAction extends AbstractSaveBeforeAction {
     
     @Override public void doIt(final View view) {
         view.setEnabled(false);
-        view.execute(new Worker() {
-            public Object construct() {
-                view.clear();
-                return null;
-            }
-            public void finished(Object value) {
-                view.setEnabled(true);
-            }
-        });
+        view.execute(new AbstractApplication.ClearViewWorker(view));
     }
 }
