@@ -18,6 +18,7 @@ import dk.sdu.mmmi.featuretracer.lib.FeatureEntryPoint;
 import org.jhotdraw.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.stream.IntStream;
 import javax.swing.*;
 import org.jhotdraw.app.Application;
 import org.jhotdraw.app.JHotDrawFeatures;
@@ -42,24 +43,26 @@ public class NewAction extends AbstractApplicationAction {
         ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.app.Labels");
         labels.configureAction(this, ID);
     }
-
+    
     @FeatureEntryPoint(JHotDrawFeatures.MANAGE_DRAWINGS)
     public void actionPerformed(ActionEvent evt) {
         Application app = getApplication();
-        final View newP = app.createView();
-        int multiOpenId = 1;
-        for (View existingP : app.views()) {
-            if (existingP.getFile() == null) {
-                multiOpenId = Math.max(multiOpenId, existingP.getMultipleOpenId() + 1);
-            }
-        }
-        newP.setMultipleOpenId(multiOpenId);
-        app.add(newP);
-        newP.execute(new Runnable() {
-            public void run() {
-                newP.clear();
-            }
-        });
-        app.show(newP);
+        int multipleOpenId = getMultipleOpenId(app);
+        createNewView(app, multipleOpenId);
     }
+    
+    private void createNewView(Application app, int multipleOpenId) {
+       final View newView = app.createView();
+       newView.setMultipleOpenId(multipleOpenId);
+       app.add(newView);
+       newView.execute(newView::clear);
+       app.show(newView);
+    }
+    
+    private int getMultipleOpenId(Application app) {
+        IntStream multipleOpenIds = app.views().stream().flatMapToInt(v -> IntStream.of(v.getMultipleOpenId()));
+        return multipleOpenIds.max().orElse(1);
+    }
+    
+    
 }
