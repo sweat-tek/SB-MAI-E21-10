@@ -30,7 +30,14 @@ import org.jhotdraw.xml.DOMOutput;
  * @version 2.0 2007-05-18 Changed due to changes in Figure interface. 
  * <br>1.0 July 9, 2006 Created.
  */
-public abstract class AbstractAttributedCompositeFigure extends AbstractCompositeFigure {
+public abstract class AbstractAttributedCompositeFigure extends AbstractCompositeFigure implements drawInterface {
+    
+    drawInterface drawHelp = new drawInterface() {
+        @Override
+        public void draw(Graphics2D g) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    };
 
     private HashMap<AttributeKey, Object> attributes = new HashMap<AttributeKey, Object>();
     /**
@@ -118,33 +125,14 @@ public abstract class AbstractAttributedCompositeFigure extends AbstractComposit
             child.restoreAttributesTo(i.next());
         }
     }
-
-    public void drawFigure(Graphics2D g) {
+   
+    //Code smell cleanup result:
+    public void drawFigure(Graphics2D g){
         drawChildren(g);
-        if (AttributeKeys.FILL_COLOR.get(this) != null) {
-            g.setColor(AttributeKeys.FILL_COLOR.get(this));
-            drawFill(g);
-        }
-        if (STROKE_COLOR.get(this) != null && STROKE_WIDTH.get(this) > 0d) {
-            g.setStroke(AttributeKeys.getStroke(this));
-            g.setColor(STROKE_COLOR.get(this));
-
-            drawStroke(g);
-        }
-        if (TEXT_COLOR.get(this) != null) {
-            if (TEXT_SHADOW_COLOR.get(this) != null &&
-                    TEXT_SHADOW_OFFSET.get(this) != null) {
-                Dimension2DDouble d = TEXT_SHADOW_OFFSET.get(this);
-                g.translate(d.width, d.height);
-                g.setColor(TEXT_SHADOW_COLOR.get(this));
-                drawText(g);
-                g.translate(-d.width, -d.height);
-            }
-            g.setColor(TEXT_COLOR.get(this));
-            drawText(g);
-        }
+        //System.out.print("drawHelp called.");
+        drawHelp.draw(g);
     }
-
+    
     protected void drawChildren(Graphics2D g) {
         for (Figure child : getChildren()) {
             child.draw(g);
